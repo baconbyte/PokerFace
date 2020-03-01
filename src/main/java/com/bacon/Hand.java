@@ -1,13 +1,15 @@
 package com.bacon;
 
+import static com.bacon.HandName.HIGH_CARD;
+
 public class Hand {
-    private String name;
+    private HandName name;
 
     public Hand(String cards) {
-        name = "High Card";
+        name = HIGH_CARD;
     }
 
-    String getName() {
+    HandName getName() {
         return name;
     }
 }
