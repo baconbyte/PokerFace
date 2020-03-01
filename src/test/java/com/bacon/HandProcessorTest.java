@@ -38,8 +38,8 @@ class HandProcessorTest {
 
     @Test
     void shouldReadAvailableFile() {
-        HandProcessor objectToTest = new HandProcessor("src/test/resources/singleHand.txt");
+        HandProcessor objectToTest = new HandProcessor("src/test/resources/single-hand.txt");
         objectToTest.processFile();
-        assertThat(outContent.toString()).isEqualTo("3H JS 3C 7C 5D");
+        assertThat(outContent.toString()).isEqualTo("3H JS 4C 7C 5D => High Card");
     }
 }
