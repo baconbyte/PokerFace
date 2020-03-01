@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.bacon.HandName.*;
+import static com.bacon.HandName.HIGH_CARD;
+import static com.bacon.HandName.ONE_PAIR;
+import static com.bacon.HandName.THREE_OF_A_KIND;
+import static com.bacon.HandName.TWO_PAIR;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -24,6 +27,9 @@ public class Hand {
         Map<Character, Long> rankCount =
                 cards.stream().collect(groupingBy(Card::getRank, counting()));
 
+        if (rankCount.containsValue(3L)) {
+            return THREE_OF_A_KIND;
+        }
         if (Collections.frequency(rankCount.values(), 2L) == 2) {
             return TWO_PAIR;
         }
