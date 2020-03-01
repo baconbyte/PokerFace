@@ -1,12 +1,12 @@
 package com.bacon;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.bacon.HandName.HIGH_CARD;
-import static com.bacon.HandName.ONE_PAIR;
+import static com.bacon.HandName.*;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -24,12 +24,13 @@ public class Hand {
         Map<Character, Long> rankCount =
                 cards.stream().collect(groupingBy(Card::getRank, counting()));
 
-       if (rankCount.containsValue(2L)) {
-           return ONE_PAIR;
-       } else {
-           return HIGH_CARD;
-       }
-
+        if (Collections.frequency(rankCount.values(), 2L) == 2) {
+            return TWO_PAIR;
+        }
+        if (rankCount.containsValue(2L)) {
+            return ONE_PAIR;
+        }
+        return HIGH_CARD;
     }
 
     HandName getName() {
