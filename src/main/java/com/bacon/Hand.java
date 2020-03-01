@@ -20,25 +20,29 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 public class Hand {
-    private HandName name;
-    private Map<Character, Long> rankCount;
-    private Map<Character, Long> suitCount;
-    private List<Integer> positions;
+    //Rank order, lowest to highest including low & high aces
     private final static String RANK_ORDER = "A23456789TJQKA";
+    //Map containing the counts of all the ranks in the hand
+    private Map<Character, Long> rankCount;
+    //Map containing the counts of all the suits in the hand
+    private Map<Character, Long> suitCount;
+    //Sorted list of indexes of where the cards appear in the RANK_ORDER
+    private List<Integer> rankIndexes;
+
+    private HandName name;
 
     public Hand(String cardDefinitions) {
-        name = parseDefinitions(cardDefinitions);
+        init(cardDefinitions);
     }
 
-    private HandName parseDefinitions(String cardDefinitions) {
+    private void init(String cardDefinitions) {
         List<Card> cards = Stream.of(cardDefinitions.split(" ")).map(Card::new).collect(Collectors.toList());
         determineCounts(cards);
-
-        return determineName();
+        name = determineName();
     }
 
     private HandName determineName() {
-        if (isStraight() && suitCount.containsValue(5L) && positions.get(0) == 9) {
+        if (isStraight() && suitCount.containsValue(5L) && rankIndexes.get(0) == 9) {
             return ROYAL_FLUSH;
         }
         if (isStraight() && suitCount.containsValue(5L)) {
@@ -69,24 +73,28 @@ public class Hand {
     }
 
     private boolean isStraight() {
-        boolean hasAce = false;
-        if (positions.get(0) == 0) {
-            hasAce = true;
-        }
-
         boolean inSequence = isInSequence();
-        if (!inSequence && hasAce) {
-            positions.remove(0);
-            positions.add(13);
+        if (!inSequence && hasAce()) {
+            //try sequence again with ace in last position
+            rankIndexes.remove(0);
+            rankIndexes.add(13);
             inSequence = isInSequence();
         }
 
         return inSequence;
     }
 
+    private boolean hasAce() {
+        boolean hasAce = false;
+        if (rankIndexes.get(0) == 0) {
+            hasAce = true;
+        }
+        return hasAce;
+    }
+
     private boolean isInSequence() {
-        for (int i = 0; i < positions.size() - 1; i++) {
-            if (positions.get(i) != (positions.get(i + 1) - 1)) {
+        for (int i = 0; i < rankIndexes.size() - 1; i++) {
+            if (rankIndexes.get(i) != (rankIndexes.get(i + 1) - 1)) {
                 return false;
             }
         }
@@ -97,7 +105,7 @@ public class Hand {
         assert (cards.size() == 5);
         rankCount = cards.stream().collect(groupingBy(Card::getRank, counting()));
         suitCount = cards.stream().collect(groupingBy(Card::getSuit, counting()));
-        positions = cards.stream().map(Card::getPosition).sorted().collect(Collectors.toList());
+        rankIndexes = cards.stream().map(Card::getRankIndex).sorted().collect(Collectors.toList());
     }
 
     HandName getName() {
@@ -107,14 +115,14 @@ public class Hand {
     private static class Card {
         private char rank;
         private char suit;
-        private int position;
+        private int rankIndex;
 
         public Card(String definition) {
             assert (definition.length() == 2);
             // if required, further card validation could be carried out here
             this.rank = definition.charAt(0);
             this.suit = definition.charAt(1);
-            this.position = RANK_ORDER.indexOf(rank);
+            this.rankIndex = RANK_ORDER.indexOf(rank);
         }
 
         public char getRank() {
@@ -125,8 +133,8 @@ public class Hand {
             return suit;
         }
 
-        public int getPosition() {
-            return position;
+        public int getRankIndex() {
+            return rankIndex;
         }
     }
 }

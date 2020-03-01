@@ -40,6 +40,6 @@ class HandProcessorTest {
     void shouldReadAvailableFile() {
         HandProcessor objectToTest = new HandProcessor("src/test/resources/single-hand.txt");
         objectToTest.processFile();
-        assertThat(outContent.toString()).isEqualTo("3H JS 4C 7C 5D => High Card");
+        assertThat(outContent.toString()).isEqualTo("3H JS 4C 7C 5D => High Card\n");
     }
 }

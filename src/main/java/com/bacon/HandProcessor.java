@@ -16,9 +16,13 @@ public class HandProcessor {
             File file = new File(filename);
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
-                String cards = scanner.nextLine();
-                Hand hand = new Hand(cards);
-                System.out.print(cards + " => " + hand.getName());
+                try {
+                    String cardDefinitions = scanner.nextLine();
+                    Hand hand = new Hand(cardDefinitions);
+                    System.out.println(cardDefinitions + " => " + hand.getName());
+                } catch (AssertionError ae) {
+                    //Invalid line, ignoring and continuing with processing
+                }
             }
         } catch (FileNotFoundException fnfe) {
             System.err.println("File not Found");

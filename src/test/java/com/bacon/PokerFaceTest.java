@@ -40,7 +40,26 @@ class PokerFaceTest extends PokerFace {
     public void shouldProcessSingleHand() {
         String[] args = {"src/test/resources/single-hand.txt"};
         main(args);
-        assertThat(outContent.toString()).isEqualTo("3H JS 4C 7C 5D => High Card");
+        assertThat(outContent.toString()).isEqualTo("3H JS 4C 7C 5D => High Card\n");
+    }
+
+    @Test
+    public void shouldProcessMultipleHand() {
+        String[] args = {"src/test/resources/multiple-hands.txt"};
+        main(args);
+        assertThat(outContent.toString()).isEqualTo("3H JS 3C 7C 5D => One Pair\n" +
+                "JH 2C JD 2H 4C => Two Pairs\n" +
+                "9H 9D 3S 9S 9C => Four of a Kind\n" +
+                "9C 3H 9S 9H 3S => Full House\n");
+    }
+
+
+    @Test
+    public void shouldIgnoreInvalidLines() {
+        String[] args = {"src/test/resources/invalid-lines.txt"};
+        main(args);
+        assertThat(outContent.toString()).isEqualTo("JH 2C JD 2H 4C => Two Pairs\n" +
+                "9C 3H 9S 9H 3S => Full House\n");
     }
 
 }
