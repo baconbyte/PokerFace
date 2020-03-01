@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.bacon.HandName.FULL_HOUSE;
 import static com.bacon.HandName.HIGH_CARD;
 import static com.bacon.HandName.ONE_PAIR;
 import static com.bacon.HandName.THREE_OF_A_KIND;
@@ -27,6 +28,9 @@ public class Hand {
         Map<Character, Long> rankCount =
                 cards.stream().collect(groupingBy(Card::getRank, counting()));
 
+        if (rankCount.containsValue(3L) && rankCount.containsValue(2L)) {
+            return FULL_HOUSE;
+        }
         if (rankCount.containsValue(3L)) {
             return THREE_OF_A_KIND;
         }
