@@ -11,6 +11,8 @@ import static com.bacon.HandName.FOUR_OF_A_KIND;
 import static com.bacon.HandName.FULL_HOUSE;
 import static com.bacon.HandName.HIGH_CARD;
 import static com.bacon.HandName.ONE_PAIR;
+import static com.bacon.HandName.STRAIGHT;
+import static com.bacon.HandName.STRAIGHT_FLUSH;
 import static com.bacon.HandName.THREE_OF_A_KIND;
 import static com.bacon.HandName.TWO_PAIR;
 import static java.util.stream.Collectors.counting;
@@ -20,6 +22,8 @@ public class Hand {
     private HandName name;
     private Map<Character, Long> rankCount;
     private Map<Character, Long> suitCount;
+    private List<Integer> positions;
+    private final static String RANK_ORDER = "A23456789TJQKA";
 
     public Hand(String cardDefinitions) {
         name = parseDefinitions(cardDefinitions);
@@ -42,6 +46,9 @@ public class Hand {
         if (suitCount.containsValue(5L)) {
             return FLUSH;
         }
+        if (isStraight()) {
+            return STRAIGHT;
+        }
         if (rankCount.containsValue(3L)) {
             return THREE_OF_A_KIND;
         }
@@ -54,10 +61,36 @@ public class Hand {
         return HIGH_CARD;
     }
 
+    private boolean isStraight() {
+        boolean hasAce = false;
+        if (positions.get(0) == 0) {
+            hasAce = true;
+        }
+
+        boolean inSequence = isInSequence();
+        if (!inSequence && hasAce) {
+            positions.remove(0);
+            positions.add(13);
+            inSequence = isInSequence();
+        }
+
+        return inSequence;
+    }
+
+    private boolean isInSequence() {
+        for (int i = 0; i < positions.size() - 1; i++) {
+            if (positions.get(i) != (positions.get(i + 1) - 1)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void determineCounts(List<Card> cards) {
         assert (cards.size() == 5);
         rankCount = cards.stream().collect(groupingBy(Card::getRank, counting()));
         suitCount = cards.stream().collect(groupingBy(Card::getSuit, counting()));
+        positions = cards.stream().map(Card::getPosition).sorted().collect(Collectors.toList());
     }
 
     HandName getName() {
@@ -67,12 +100,14 @@ public class Hand {
     private static class Card {
         private char rank;
         private char suit;
+        private int position;
 
         public Card(String definition) {
             assert (definition.length() == 2);
             // if required, further card validation could be carried out here
             this.rank = definition.charAt(0);
             this.suit = definition.charAt(1);
+            this.position = RANK_ORDER.indexOf(rank);
         }
 
         public char getRank() {
@@ -81,6 +116,10 @@ public class Hand {
 
         public char getSuit() {
             return suit;
+        }
+
+        public int getPosition() {
+            return position;
         }
     }
 }
