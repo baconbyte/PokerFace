@@ -11,6 +11,7 @@ import static com.bacon.HandName.FOUR_OF_A_KIND;
 import static com.bacon.HandName.FULL_HOUSE;
 import static com.bacon.HandName.HIGH_CARD;
 import static com.bacon.HandName.ONE_PAIR;
+import static com.bacon.HandName.ROYAL_FLUSH;
 import static com.bacon.HandName.STRAIGHT;
 import static com.bacon.HandName.STRAIGHT_FLUSH;
 import static com.bacon.HandName.THREE_OF_A_KIND;
@@ -37,6 +38,9 @@ public class Hand {
     }
 
     private HandName determineName() {
+        if (isStraight() && suitCount.containsValue(5L) && positions.get(0) == 9) {
+            return ROYAL_FLUSH;
+        }
         if (isStraight() && suitCount.containsValue(5L)) {
             return STRAIGHT_FLUSH;
         }
