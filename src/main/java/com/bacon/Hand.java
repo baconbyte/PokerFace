@@ -37,6 +37,9 @@ public class Hand {
     }
 
     private HandName determineName() {
+        if (isStraight() && suitCount.containsValue(5L)) {
+            return STRAIGHT_FLUSH;
+        }
         if (rankCount.containsValue(4L)) {
             return FOUR_OF_A_KIND;
         }
