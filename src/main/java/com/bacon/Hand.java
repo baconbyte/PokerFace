@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class Hand {
     private HandName name;
+    private Map<Character, Long> rankCount;
+    private Map<Character, Long> suitCount;
 
     public Hand(String cardDefinitions) {
         name = parseDefinitions(cardDefinitions);
@@ -25,14 +27,12 @@ public class Hand {
 
     private HandName parseDefinitions(String cardDefinitions) {
         List<Card> cards = Stream.of(cardDefinitions.split(" ")).map(Card::new).collect(Collectors.toList());
-        assert (cards.size() == 5);
+        determineCounts(cards);
 
-        Map<Character, Long> rankCount =
-                cards.stream().collect(groupingBy(Card::getRank, counting()));
+        return determineName();
+    }
 
-        Map<Character, Long> suitCount =
-                cards.stream().collect(groupingBy(Card::getSuit, counting()));
-
+    private HandName determineName() {
         if (rankCount.containsValue(4L)) {
             return FOUR_OF_A_KIND;
         }
@@ -54,6 +54,12 @@ public class Hand {
         return HIGH_CARD;
     }
 
+    private void determineCounts(List<Card> cards) {
+        assert (cards.size() == 5);
+        rankCount = cards.stream().collect(groupingBy(Card::getRank, counting()));
+        suitCount = cards.stream().collect(groupingBy(Card::getSuit, counting()));
+    }
+
     HandName getName() {
         return name;
     }
@@ -64,7 +70,7 @@ public class Hand {
 
         public Card(String definition) {
             assert (definition.length() == 2);
-            // further card validation could be carried out here
+            // if required, further card validation could be carried out here
             this.rank = definition.charAt(0);
             this.suit = definition.charAt(1);
         }
